@@ -1,224 +1,58 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import TaskAdd from './components/TaskAdd.vue'
+import BookForm from './components/BookForm.vue'
+import { ref, watch } from 'vue'
 
-const tasks = ref([])
-const newTask = ref('')
-const editingId = ref(null)
-const editingTitle = ref('')
+const books = ref(JSON.parse(localStorage.getItem('books') || '[]'))
+const editingBook = ref(null)
 
-function addTask(task) {
-  tasks.value.push({
-    id: Date.now(),
-    title: task,
-    completed: false
-  })
+watch(books, (value) => {
+  localStorage.setItem('books', JSON.stringify(value))
+}, { deep: true })
 
-  saveTasks()
-}
-
-function deleteTask(id) {
-  tasks.value = tasks.value.filter(task => task.id !== id)
-  saveTasks()
-}
-
-function editTask(task) {
-  editingId.value = task.id
-  editingTitle.value = task.title
-}
-
-function updateTask(id) {
-  if (editingTitle.value.trim() === '') {
-    return
-  }
-
-  const task = tasks.value.find(task => task.id === id)
-
-  if (task) {
-    task.title = editingTitle.value
-  }
-
-  editingId.value = null
-  editingTitle.value = ''
-  saveTasks()
+function startEdit(book) {
+  editingBook.value = book
 }
 
 function cancelEdit() {
-  editingId.value = null
-  editingTitle.value = ''
+  editingBook.value = null
 }
 
-function toggleTask(id) {
-  const task = tasks.value.find(task => task.id === id)
-
-  if (task) {
-    task.completed = !task.completed
+function saveBook(data) {
+  if (editingBook.value) {
+    books.value = books.value.map(book =>
+      book.id === editingBook.value.id ? { ...book, ...data } : book
+    )
+    editingBook.value = null
+  } else {
+    books.value.push({ id: Date.now(), ...data })
   }
-  saveTasks()
 }
 
-function saveTasks() {
-  localStorage.setItem(
-    'tasks',
-    JSON.stringify(tasks.value)
-  )
+function deleteBook(id) {
+  if (!confirm('Delete this book?')) return
+  books.value = books.value.filter(book => book.id !== id)
 }
 
-onMounted(() => {
-  const savedTasks = localStorage.getItem('tasks')
-
-  if (savedTasks) {
-    tasks.value = JSON.parse(savedTasks)
-  }
-})
 </script>
 
 <template>
-  <div class="container">
-    
-    <h1>My Task List</h1>
+  <main>
+    <h1>My Book Library</h1>
 
-    <TaskAdd @add="addTask" />
+    <BookForm :editing-book="editingBook" @save="saveBook" @cancel="cancelEdit" />
 
-    <div class="task-list">
+    <p v-if="books.length === 0">No books yet. Add one above.</p>
 
-      <h2>Tasks</h2>
+    <ul>
+      <li v-for="book in books" :key="book.id" :class="{ finished: book.status === 'Finished' }">
 
-      <p v-if="tasks.length === 0" class="empty">
-        There are no tasks. Add a task to get started!
-      </p>
-
-      <div v-for="task in tasks" :key="task.id" class="task-card">
-
-        <div v-if="editingId !== task.id">
-
-          <div class="task-content">
-
-            <input type="checkbox" :checked="task.completed" @change="toggleTask(task.id)"/>
-
-            <span :class="{ completed: task.completed }">{{ task.title }}</span>
-
-          </div>
-
-          <div class="buttons">
-
-            <button class="edit" @click="editTask(task)">Edit</button>
-
-            <button class="delete" @click="deleteTask(task.id)">Delete</button>
-
-          </div>
-
-        </div>
-
-        <div v-else>
-
-          <input v-model="editingTitle" class="edit-input" type="text" @keyup.enter="updateTask(task.id)"/>
-
-          <div class="buttons">
-
-            <button class="save" @click="updateTask(task.id)">Save</button>
-
-            <button class="cancel" @click="cancelEdit">Cancel</button>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+        <span class="info">
+          <strong>{{ book.title }}</strong> by {{ book.author }} — {{ book.status }}
+        </span>
+        
+        <button @click="startEdit(book)">Edit</button>
+        <button @click="deleteBook(book.id)">Delete</button>
+      </li>
+    </ul>
+  </main>
 </template>
-
-<style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #dbdbdb;
-  font-family: Arial, sans-serif;
-}
-
-.container {
-  width: 500px;
-  max-width: 90%;
-  margin: 50px auto;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.task-list {
-  margin-top: 30px;
-}
-.task-list h2 {
-  margin-bottom: 15px;
-}
-
-.empty {
-  text-align: center;
-  color: #9b9b9b;
-}
-
-.task-card {
-  padding: 15px;
-  margin-bottom: 12px;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-  background: #ffffff;
-}
-
-.task-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.task-content input {
-  width: 18px;
-  height: 18px;
-}
-
-.completed {
-  text-decoration: line-through;
-  color: #888;
-}
-
-.buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-.buttons button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-}
-
-.edit {
-  background: #1658e6;
-}
-.delete {
-  background: #d81d1d;
-}
-.save {
-  background: #0fca3e;
-}
-.cancel {
-  background: #7c7c7c;
-}
-
-.edit-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #d6d6d6;
-  border-radius: 5px;
-}
-</style>
