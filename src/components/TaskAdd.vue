@@ -42,7 +42,7 @@ function addTask() {
 .add-task input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #e4e4e4;
   border-radius: 5px;
 }
 
@@ -50,12 +50,12 @@ function addTask() {
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  background: #42b883;
+  background: #28cc43;
   color: white;
   cursor: pointer;
 }
 
 .add-task button:hover {
-  background: #369b6e;
+  background: #0fac29;
 }
 </style>

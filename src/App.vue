@@ -3,9 +3,7 @@ import { ref, onMounted } from 'vue'
 import TaskAdd from './components/TaskAdd.vue'
 
 const tasks = ref([])
-
 const newTask = ref('')
-
 const editingId = ref(null)
 const editingTitle = ref('')
 
@@ -21,10 +19,8 @@ function addTask(task) {
 
 function deleteTask(id) {
   tasks.value = tasks.value.filter(task => task.id !== id)
-
   saveTasks()
 }
-
 
 function editTask(task) {
   editingId.value = task.id
@@ -44,7 +40,6 @@ function updateTask(id) {
 
   editingId.value = null
   editingTitle.value = ''
-
   saveTasks()
 }
 
@@ -59,7 +54,6 @@ function toggleTask(id) {
   if (task) {
     task.completed = !task.completed
   }
-
   saveTasks()
 }
 
@@ -81,7 +75,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
-
+    
     <h1>My Task List</h1>
 
     <TaskAdd @add="addTask" />
@@ -91,48 +85,26 @@ onMounted(() => {
       <h2>Tasks</h2>
 
       <p v-if="tasks.length === 0" class="empty">
-        No tasks available.
+        There are no tasks. Add a task to get started!
       </p>
 
-      <div
-        v-for="task in tasks"
-        :key="task.id"
-        class="task-card"
-      >
+      <div v-for="task in tasks" :key="task.id" class="task-card">
 
         <div v-if="editingId !== task.id">
 
           <div class="task-content">
 
-            <input
-              type="checkbox"
-              :checked="task.completed"
-              @change="toggleTask(task.id)"
-            />
+            <input type="checkbox" :checked="task.completed" @change="toggleTask(task.id)"/>
 
-            <span
-              :class="{ completed: task.completed }"
-            >
-              {{ task.title }}
-            </span>
+            <span :class="{ completed: task.completed }">{{ task.title }}</span>
 
           </div>
 
           <div class="buttons">
 
-            <button
-              class="edit"
-              @click="editTask(task)"
-            >
-              Edit
-            </button>
+            <button class="edit" @click="editTask(task)">Edit</button>
 
-            <button
-              class="delete"
-              @click="deleteTask(task.id)"
-            >
-              Delete
-            </button>
+            <button class="delete" @click="deleteTask(task.id)">Delete</button>
 
           </div>
 
@@ -140,38 +112,20 @@ onMounted(() => {
 
         <div v-else>
 
-          <input
-            v-model="editingTitle"
-            class="edit-input"
-            type="text"
-            @keyup.enter="updateTask(task.id)"
-          />
+          <input v-model="editingTitle" class="edit-input" type="text" @keyup.enter="updateTask(task.id)"/>
 
           <div class="buttons">
 
-            <button
-              class="save"
-              @click="updateTask(task.id)"
-            >
-              Save
-            </button>
+            <button class="save" @click="updateTask(task.id)">Save</button>
 
-            <button
-              class="cancel"
-              @click="cancelEdit"
-            >
-              Cancel
-            </button>
+            <button class="cancel" @click="cancelEdit">Cancel</button>
 
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
+
 </template>
 
 <style>
@@ -181,7 +135,7 @@ onMounted(() => {
 
 body {
   margin: 0;
-  background: #f2f4f7;
+  background: #dbdbdb;
   font-family: Arial, sans-serif;
 }
 
@@ -203,22 +157,21 @@ h1 {
 .task-list {
   margin-top: 30px;
 }
-
 .task-list h2 {
   margin-bottom: 15px;
 }
 
 .empty {
   text-align: center;
-  color: #777;
+  color: #9b9b9b;
 }
 
 .task-card {
   padding: 15px;
   margin-bottom: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   border-radius: 8px;
-  background: #fafafa;
+  background: #ffffff;
 }
 
 .task-content {
@@ -226,7 +179,6 @@ h1 {
   align-items: center;
   gap: 10px;
 }
-
 .task-content input {
   width: 18px;
   height: 18px;
@@ -242,7 +194,6 @@ h1 {
   gap: 8px;
   margin-top: 12px;
 }
-
 .buttons button {
   padding: 8px 14px;
   border: none;
@@ -252,25 +203,22 @@ h1 {
 }
 
 .edit {
-  background: #3498db;
+  background: #1658e6;
 }
-
 .delete {
-  background: #e74c3c;
+  background: #d81d1d;
 }
-
 .save {
-  background: #27ae60;
+  background: #0fca3e;
 }
-
 .cancel {
-  background: #777;
+  background: #7c7c7c;
 }
 
 .edit-input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #d6d6d6;
   border-radius: 5px;
 }
 </style>
